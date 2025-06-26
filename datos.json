@@ -1,0 +1,47 @@
+[
+    {
+        "Dia_Entrada": "12/25/2025",
+        "numero_cliente": "2131322",
+        "nombre_de_cliente": "vik",
+        "Año": "2001",
+        "Marca": "nissan",
+        "Vin": "0000",
+        "Causa": "corto"
+    },
+    {
+        "Dia_Entrada": "12/25/2024",
+        "numero_cliente": "2131322546645",
+        "nombre_de_cliente": "derek",
+        "Año": "1999",
+        "Marca": "nissan",
+        "Vin": "0000",
+        "Causa": "corto"
+    },
+    {
+        "Dia_Entrada": "12/25/2022",
+        "numero_cliente": "2131322546645",
+        "nombre_de_cliente": "cri",
+        "Año": "2001",
+        "Marca": "honda",
+        "Vin": "0000",
+        "Causa": "falso contacto"
+    },
+    {
+        "Dia_Entrada": "a",
+        "numero_cliente": "a",
+        "nombre_de_cliente": "a",
+        "Año": "a",
+        "Marca": "a",
+        "Vin": "aa",
+        "Causa": "a"
+    },
+    {
+        "Dia_Entrada": "a",
+        "numero_cliente": "a",
+        "nombre_de_cliente": "a",
+        "Año": "a",
+        "Marca": "aa",
+        "Vin": "a",
+        "Causa": "a"
+    }
+]

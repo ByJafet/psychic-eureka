@@ -1,17 +1,28 @@
 import customtkinter as ctk
+import json, os
 
+
+
+    
 class FormularioIngreso(ctk.CTkFrame):
+    
 
     
     def __init__(self, master):
+        self.registros = []
         super().__init__(master)
         self.crear_widgets()
         self.pack_propagate(False)
+        self.cargar_desde_json()
+
+    
 
     def crear_widgets(self):
         # Titulo
-        titulo = ctk.CTkLabel(self, text="Formulario de ingreso", font=ctk.CTkFont(size=20, weight="bold"))
+        titulo = ctk.CTkLabel(self, text="Formulario de ingreso", font=ctk.CTkFont(size=25, weight="bold"))
         titulo.grid(row=0, column=0, columnspan=2, pady=(10, 20))
+
+       
 
         # Dia de entrada
         self.label_dia_entrada = ctk.CTkLabel(self, text="Dia de entrada:")
@@ -71,8 +82,39 @@ class FormularioIngreso(ctk.CTkFrame):
         #Guardar
 
         self.entry_Guardar = ctk.CTkButton(self, text="Guardar Datos", command=self.guardar_datos)
-        self.entry_Guardar.grid(row=12, column=0, columnspan=2, pady=20)
+        self.entry_Guardar.grid(row=8, column=1, columnspan=2, pady=20)
         
+        #a
+        #self.frame_botones = ctk.CTkFrame(self)
+        #self.frame_botones.grid(row=0, column=0, columnspan=2, sticky="s", padx=10, pady=(10,0))
+        
+        
+        
+        
+        
+        
+        #Boton de registro
+
+        self.boton_mostrar = ctk.CTkButton(self, text="Mostrar Registros", command=self.abrir_ventana_registros)
+        self.boton_mostrar.place(relx=0.03, rely=0.878 )
+
+    
+    
+    def mostrar_registros(self):
+        print("\m--- Lista de registros ---")
+        for i, registro in enumerate(self.registros, start=1):
+            print(f"Registro #{i}:")
+            for clave, valor in registro.items():
+                print(f"  {clave}: {valor}")
+            print("---------------------------")
+            
+    
+    def cargar_desde_json(self):
+        if os.path.exists("datos.json"):
+            with open("datos.json", "r", encoding="utf-8") as archivo:
+                self.registros = json.load(archivo)
+
+
     def guardar_datos(self): #guardar datos 
         
         datos = {
@@ -85,7 +127,66 @@ class FormularioIngreso(ctk.CTkFrame):
             "Causa": self.entry_causa.get(),
 
         }
-        print("Datos Guardados")
-        print(datos)
-        pass
+        
+        self.registros.append(datos)
+
+        print("Registro guardado correctamente")
+        print(f"Total  registros: {len(self.registros)}")
+        print("Ultimo registro:", datos)
+
+        self.guardar_en_archivo_json()
+
+        if hasattr(self, "actualizar_registros_ui"):
+            self.actualizar_registros_ui("")
+
     
+   
+   
+    def abrir_ventana_registros(self):
+        ventana = ctk.CTkToplevel(self)
+        ventana.title("Registros")
+        ventana.geometry("600x400")
+        
+        frame_resultados = ctk.CTkScrollableFrame(ventana)
+        frame_resultados.pack(fill="both", expand=True, padx=10, pady=(50, 10))
+
+       
+        def filtrar_registros(texto):
+            for widget in frame_resultados.winfo_children():
+                widget.destroy()
+        
+            texto = texto.lower()
+
+            resultados = [
+                r for r in self.registros
+                if texto in r["nombre_de_cliente"].lower()
+                or texto in r["Marca"].lower()
+                or texto in r["Año"].lower()
+                or texto in r["Numero"].lower
+                or texto in r["Dia_Entrada"].lower()
+            ]
+
+            for i, registro in enumerate(resultados, start=1):
+             texto_registro = f"{i}. Cliente: {registro['nombre_de_cliente']} | Marca: {registro['Marca']} | Numero: {registro['numero_cliente']} | Año: {registro['Año']} | Entrada: {registro['Dia_Entrada']}"
+             etiqueta = ctk.CTkLabel(frame_resultados, text=texto_registro, anchor="w")
+             etiqueta.pack(fill="x", padx=5, pady=2)
+    
+        
+        campo_busqueda = ctk.CTkEntry(ventana, placeholder_text="Buscar")
+        campo_busqueda.pack(padx=10, pady=(10, 5), fill="x")
+
+        
+        boton_buscar = ctk.CTkButton(ventana, text="Buscar", command=lambda: filtrar_registros(campo_busqueda.get()))
+        boton_buscar.pack(padx=10, pady=(0, 10))
+        
+        self.actualizar_registros_ui = filtrar_registros
+        
+        filtrar_registros("")
+
+
+
+
+
+    def guardar_en_archivo_json(self):
+        with open("datos.json", "w", encoding="utf-8") as archivo:
+            json.dump(self.registros, archivo, indent=4, ensure_ascii=False)
