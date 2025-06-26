@@ -136,22 +136,78 @@ class FormularioIngreso(ctk.CTkFrame):
 
         self.guardar_en_archivo_json()
 
-        if hasattr(self, "actualizar_registros_ui"):
-            self.actualizar_registros_ui("")
-
     
    
    
     def abrir_ventana_registros(self):
+        registro_seleccionado = {"registro": None}
         ventana = ctk.CTkToplevel(self)
         ventana.title("Registros")
         ventana.geometry("600x400")
         
+        
+        frame_edicion = ctk.CTkFrame(ventana)
+        frame_edicion.pack(fill="x", padx=10, pady=10)
+
+        campo_busqueda = ctk.CTkEntry(ventana, placeholder_text="Buscar")
+        campo_busqueda.pack(padx=10, pady=(10, 5), fill="x")
+
+       
+
+        
+
+        boton_buscar = ctk.CTkButton(ventana, text="Buscar", command=lambda: filtrar_registros(campo_busqueda.get()))
+        boton_buscar.pack(padx=10, pady=(0, 10))
+
         frame_resultados = ctk.CTkScrollableFrame(ventana)
         frame_resultados.pack(fill="both", expand=True, padx=10, pady=(50, 10))
 
+        def editar_registro_en_mismo_frame():
+            registro = registro_seleccionado["registro"]
+            if not registro:
+                print("Fail")
+                return
+            for widget in frame_edicion.winfo_children():
+                widget.destroy()
+
+            entradas = {}
+            fila = 0
+
+            
+            for clave, valor in registro.items():
+                label = ctk.CTkLabel(frame_edicion, text=clave + ":")
+                label.grid(row=fila, column=0, padx=10, pady=5, sticky="e")
+
+                entry = ctk.CTkEntry(frame_edicion)
+                entry.insert(0, valor)
+                entry.grid(row=fila, column=1, padx=10, pady=5, sticky="w")
+                entradas[clave] = entry
+                fila += 1
+            
+            def guardar_cambios():
+                for clave in entradas:
+                    registro[clave] = entradas[clave].get()
+                
+                self.guardar_en_archivo_json()
+                filtrar_registros("")
+                
+                boton_guardar = ctk.CTkButton(frame_edicion, text="Guardar Cambios", command=guardar_cambios)
+                boton_guardar.grid(row=fila + 1, column=0, columnspan=2, pady=10)
+
+        boton_editar = ctk.CTkButton(
+            ventana,
+            text="Editar Registro",
+            command=editar_registro_en_mismo_frame
+        )
+        boton_editar.pack(padx=10, pady=(0, 10))
+            
+        
        
         def filtrar_registros(texto):
+
+            def seleccionar_registro(r):
+                return lambda e: registro_seleccionado.update({"registro": r})
+            
             for widget in frame_resultados.winfo_children():
                 widget.destroy()
         
@@ -162,24 +218,28 @@ class FormularioIngreso(ctk.CTkFrame):
                 if texto in r["nombre_de_cliente"].lower()
                 or texto in r["Marca"].lower()
                 or texto in r["Año"].lower()
-                or texto in r["Numero"].lower
+                or texto in r["numero_cliente"].lower
                 or texto in r["Dia_Entrada"].lower()
             ]
 
             for i, registro in enumerate(resultados, start=1):
              texto_registro = f"{i}. Cliente: {registro['nombre_de_cliente']} | Marca: {registro['Marca']} | Numero: {registro['numero_cliente']} | Año: {registro['Año']} | Entrada: {registro['Dia_Entrada']}"
+            
+             
+             
              etiqueta = ctk.CTkLabel(frame_resultados, text=texto_registro, anchor="w")
              etiqueta.pack(fill="x", padx=5, pady=2)
+             etiqueta.bind("<Button-1>", seleccionar_registro(registro))
     
         
-        campo_busqueda = ctk.CTkEntry(ventana, placeholder_text="Buscar")
-        campo_busqueda.pack(padx=10, pady=(10, 5), fill="x")
+        
 
         
-        boton_buscar = ctk.CTkButton(ventana, text="Buscar", command=lambda: filtrar_registros(campo_busqueda.get()))
-        boton_buscar.pack(padx=10, pady=(0, 10))
+       
+
         
-        self.actualizar_registros_ui = filtrar_registros
+        
+        
         
         filtrar_registros("")
 

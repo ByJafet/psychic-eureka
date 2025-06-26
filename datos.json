@@ -43,5 +43,14 @@
         "Marca": "aa",
         "Vin": "a",
         "Causa": "a"
+    },
+    {
+        "Dia_Entrada": "",
+        "Numero_de_cliente": "",
+        "nombre_de_cliente": "",
+        "Año": "",
+        "Marca": "",
+        "Vin": "",
+        "Causa": ""
     }
 ]
